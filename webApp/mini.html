@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>shoRPG Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #23272e;
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: #2c313a;
+      border-radius: 16px;
+      padding: 24px 32px;
+      margin-top: 40px;
+      box-shadow: 0 4px 24px #0004;
+      min-width: 280px;
+      max-width: 90vw;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 1.6em;
+      color: #ffb300;
+    }
+    .stats {
+      margin: 16px 0 0 0;
+      font-size: 1.1em;
+      line-height: 1.7;
+    }
+    .close-btn {
+      margin-top: 24px;
+      background: #ffb300;
+      color: #23272e;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 24px;
+      font-size: 1em;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    .close-btn:hover {
+      background: #ffa000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Статистика гравця</h1>
+    <div class="stats" id="stats">
+      Завантаження...
+    </div>
+    <button class="close-btn" onclick="window.Telegram.WebApp.close()">Закрити</button>
+  </div>
+  <script>
+    // Отримання даних гравця через Telegram WebApp initData
+    async function fetchPlayerStats() {
+      // Для демо: отримуємо username з Telegram WebApp
+      const tg = window.Telegram.WebApp;
+      const user = tg.initDataUnsafe.user;
+      let stats = 'Не вдалося отримати дані.';
+      if (user) {
+        // Запит до бекенду для отримання стати гравця
+        try {
+          const res = await fetch(`/webapp/player?user_id=${user.id}`);
+          if (res.ok) {
+            const data = await res.json();
+            stats = `👤 <b>${data.name}</b><br>🔢 Рівень: ${data.level}<br>⭐ Досвід: ${data.exp}<br>🎒 Інвентар: ${data.inventory.length ? data.inventory.join(', ') : 'порожній'}`;
+          }
+        } catch (e) {}
+      }
+      document.getElementById('stats').innerHTML = stats;
+    }
+    fetchPlayerStats();
+  </script>
+</body>
+</html>
